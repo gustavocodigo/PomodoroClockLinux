@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <strong style="display: flex; align-items: center; gap: 8px;background-color: rgba(0, 0, 0, 0.322); padding: 10px">
+        <img style="width: 100%; max-width: 40px;" src="https://pt.online-timers.com/png/pt/timer-pomodoro.png">
+        POMODORO<label style="color: lightcoral">CLOCK</label>
+
+    </strong>
+    <main>
+
+        <div>
+
+
+
+            <h1 id="timer">00:00</h1>
+
+            <strong id="msg">Time to study</strong>
+
+
+            <hr style="border-color: rgba(3, 3, 3, 0.329)">
+
+            <br>
+
+            <button onclick="click_button(this)" class="buttton-study" id="restore">
+                <div style="display: flex;align-items: center;justify-content: center; gap: 10px">RESTORE <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black"
+                        class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                        <path
+                            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                    </svg></div>
+            </button>
+            <button onclick="click_button(this)" class="buttton-study" id="main-button">PAUSE</button>
+
+
+        </div>
+
+
+    </main>
+
+    <label id="version">
+        1.0.0
+    </label>
+
+    <div id="toast">MESSAGE</div>
+
+</body>
+
+</html>
+
+<style>
+
+* {
+  
+  
+}
+img {
+  user-drag: none;
+  -webkit-user-drag: none; /* Para compatibilidade com navegadores baseados no WebKit */
+}
+
+
+    body {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+
+        color: white;
+        
+
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    }
+
+    body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: 100%;
+        background-color: rgb(199, 198, 196);
+        background-size: cover;
+        /* filter:blur(2px); */
+        z-index: -10;
+        background-image: url(https://storage.googleapis.com/webdesignledger.pub.network/LaT/edd/2016/02/tan-seamless-paper-textures-4-270x270.jpg);
+    }
+
+    main {
+
+        min-height: 196px;
+        padding: 20px;
+        margin: auto;
+        max-width: 500px;
+
+        box-sizing: border-box;
+        /* background-color: rgb(219, 219, 219); */
+
+
+
+    }
+
+    div {
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    button {
+        background-color: rgb(124, 197, 124);
+        padding: 6px;
+        border-radius: 8px;
+        font-weight: 800;
+        color: white;
+        border: none;
+
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        width: 150px;
+        max-width: 100%;
+        transition: 0.5s;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    button:hover {
+        cursor: pointer;
+        transition: 0.5s;
+    }
+
+    .buttton-study {
+        background-color: rgb(228, 131, 119);
+
+    }
+
+    #version {
+        position: fixed;
+        bottom: 12px;
+        right: 12px;
+    }
+
+
+    #restore {
+        transition: 1s;
+        margin-bottom: 12px;
+        
+    }
+
+    #restore:hover {
+        cursor: pointer;
+    }
+    #restore:active {
+        transition: 0.4s;
+        background-color: rgb(233, 213, 213);
+    }
+
+    #toast {
+        background-color: rgb(236, 124, 124);
+        padding: 8px;
+        padding-left: 12px;
+        position: fixed;
+        top: 60px;
+        height: 30px;
+        width: 140px;
+        max-width: 100%;
+        right: 0;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: smaller;
+        border: 8px solid rgb(179, 233, 179);
+        border-top: 0;
+        border-right: 0;
+        border-bottom: 0;
+        transform: translateX(100%);
+        transition: 0.6s;
+
+    }
+
+    .toast-appear {
+        transition: 0.3s;
+        transform: translateX(0%) !important;
+    }
+</style>
+
+<script>
+ var audio = new Audio('./assets/alert-critical.wav');
+
+    const messages = [
+        "Time to focus",
+        "Time for a break!"
+    ]
+
+    class Clock {
+        constructor() {
+            this.paused = false;
+            this.state = "focus"
+            this.restart_focus();
+        }
+        update_time() {
+            if (this.paused) return;
+            this.elapsedDate = new Date(new Date() - this.startDate.getTime());
+            let minutes = this.elapsedDate.getMinutes()
+            let seconds = this.elapsedDate.getSeconds()
+
+            if (this.state == "focus") {
+                document.getElementById("timer").innerText = `${(24 - minutes).toString().padStart(2, '0')}:${(59 - seconds).toString().padStart(2, '0')}`
+                if (this.elapsedDate.getTime() >= 25 * 60 * 1000) {
+                    show_notification("Pomodoro Clock", "TIME TO BREAK")
+                    
+                    audio.play();
+                    this.state = "break"
+                    this.restart_break()
+                    click_button(document.getElementById("main-button"))
+                    document.getElementById("timer").innerText = `5:00`
+                }
+                document.getElementById("msg").innerText = messages[0]
+            } else if (this.state == "break") {
+                document.getElementById("timer").innerText = `${(4 - minutes).toString().padStart(2, '0')}:${(59 - seconds).toString().padStart(2, '0')}`
+                if (this.elapsedDate.getTime() >= 5 * 60 * 1000) {
+                    show_notification("Pomodoro Clock", "TIME TO FOCUS")
+                    audio.play();
+                    this.state = "focus"
+                    this.restart_focus()
+                    click_button(document.getElementById("main-button"))
+                    document.getElementById("timer").innerText = `25:00`
+
+                }
+                document.getElementById("msg").innerText = messages[1]
+            }
+
+        }
+        set_message(msg) {
+            document.getElementById("msg").innerText = msg
+        }
+        pause() {
+            this.paused = true
+            this.pause_date = new Date()
+        }
+        resume() {
+            this.paused = false
+            let delta = new Date().getTime() - this.pause_date.getTime()
+            this.startDate.setTime(this.startDate.getTime() + delta);
+
+        }
+
+        restart_focus() {
+            this.startDate = new Date()
+            this.state = "focus"
+        }
+
+        restart_break() {
+            this.startDate = new Date()
+            this.state = "break"
+        }
+    }
+
+
+    const clock = new Clock();
+
+
+    var last_timeout_id = null
+
+
+
+    function show_dom_toast(msg) {
+        let element = document.getElementById("toast")
+        element.innerText = msg
+        element.classList.add("toast-appear")
+        if (last_timeout_id) clearTimeout(last_timeout_id)
+        last_timeout_id = setTimeout(() => {
+            element.classList.remove("toast-appear")
+        }, 4000)
+
+    }
+    function click_button(element) {
+
+        if (document.getElementById("restore") == element) {
+            clock.pause()
+            clock.restart_focus();
+            clock.restart_break();
+            clock.resume()
+            show_dom_toast("RESTORE TIMER")
+          
+            return;
+        }
+        let state = element.innerText
+        if (state == "PAUSE") {
+            clock.pause();
+            element.innerText = "RESUME"
+            show_dom_toast("IDLING TIMER")
+        }
+        if (state == "RESUME") {
+            clock.resume();
+            element.innerText = "PAUSE"
+            show_dom_toast("RESUMING TIMER")
+        }
+        element.classList.toggle("buttton-study")
+
+    }
+    setInterval(() => {
+        clock.update_time()
+    }, 1000)
+</script>
