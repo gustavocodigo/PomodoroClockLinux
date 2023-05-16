@@ -1,3 +1,0 @@
-/home/admin/Área de Trabalho/HackMenu (outra cópia)/Build/CMakeFiles/ProgramFile.dir
-/home/admin/Área de Trabalho/HackMenu (outra cópia)/Build/CMakeFiles/edit_cache.dir
-/home/admin/Área de Trabalho/HackMenu (outra cópia)/Build/CMakeFiles/rebuild_cache.dir
